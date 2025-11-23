@@ -1,0 +1,17 @@
+[project]
+name = "pdf2kg4llm"
+version = "0.1.0"
+description = "PDF to Knowledge Graph for LLM"
+requires-python = ">=3.12"
+dependencies = [
+    "pypdf>=4.0.0",
+    "cryptography>=3.1",
+    "openai>=1.0.0",
+    "neo4j>=5.15.0",
+    "python-dotenv>=1.0.0",
+    "jupyter>=1.0.0",
+    "diskcache>=5.6.0",
+    "tqdm>=4.66.0",
+    "networkx>=3.2",
+    "matplotlib>=3.8.0",
+]
