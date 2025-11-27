@@ -16,8 +16,8 @@ ENV/
 .env
 
 # 数据和输出
-data/*.pdf
-output/
+# data/*.pdf
+# output/
 
 # IDE
 .idea/

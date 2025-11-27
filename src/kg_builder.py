@@ -54,7 +54,7 @@ class KGBuilder:
             return self.cache[cache_key]
 
         # 使用 JSON Output 功能
-        system_prompt = """从文本中提取知识图谱的实体和关系。
+        system_prompt = """从文本中提取知识图谱的实体和关系。注意统一使用中文，去除无意义的实体和关系，仅保留具体的、有价值的信息。
 
 输出 JSON 格式：
 {

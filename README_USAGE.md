@@ -37,13 +37,13 @@ mkdir -p data
 启动 Jupyter：
 
 ```bash
-jupyter notebook pdf2kg_pipeline.ipynb
+jupyter notebook pdf2kg_batch.ipynb
 ```
 
 或使用 JupyterLab：
 
 ```bash
-jupyter lab pdf2kg_pipeline.ipynb
+jupyter lab pdf2kg_batch.ipynb
 ```
 
 在 notebook 中：
