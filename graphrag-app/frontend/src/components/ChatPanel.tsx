@@ -269,7 +269,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
         )}
 
         {messages.length === 0 ? (
-          // Empty State
+          // Empty State（简化版）
           <Box
             sx={{
               flex: 1,
@@ -280,37 +280,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
               gap: 3,
             }}
           >
-            <Box
-              sx={{
-                width: 80,
-                height: 80,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #2563eb 0%, #22c55e 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 12px 32px rgba(15, 23, 42, 0.22)',
-                animation: 'pulse 2s ease-in-out infinite',
-                '@keyframes pulse': {
-                  '0%, 100%': {
-                    transform: 'scale(1)',
-                    opacity: 1,
-                  },
-                  '50%': {
-                    transform: 'scale(1.05)',
-                    opacity: 0.9,
-                  },
-                },
-              }}
-            >
-              <SparkleIcon sx={{ fontSize: 40, color: 'white' }} />
-            </Box>
-
             <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h5" sx={{ fontWeight: 600, color: '#0f172a', mb: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#0f172a', mb: 1 }}>
                 开始对话
               </Typography>
-              <Typography variant="body2" sx={{ color: '#6b7280', maxWidth: 300 }}>
+              <Typography variant="body2" sx={{ color: '#6b7280', maxWidth: 320 }}>
                 向 AI 助手提问关于知识图谱的任何问题
               </Typography>
             </Box>
