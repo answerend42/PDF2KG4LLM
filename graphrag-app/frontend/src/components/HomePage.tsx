@@ -60,103 +60,113 @@ const HomePage: React.FC = () => {
       sx={{
         display: 'flex',
         height: '100vh',
-        gap: 2.5,
         padding: 3,
         backgroundColor: 'background.default',
         position: 'relative',
       }}
     >
       {/* Knowledge Graph - 70% */}
-      <Box sx={{ flex: 7, minWidth: 0 }}>
+      <Box
+        sx={{
+          flex: 7,
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: '#ffffff',
+        }}
+      >
+        {/* Navigation Tabs above graph / context */}
         <Box
           sx={{
-            height: '100%',
-            borderRadius: 4,
-            border: '1px solid',
+            borderBottom: '1px solid',
             borderColor: alpha('#111827', 0.08),
-            boxShadow: '0 12px 30px rgba(15, 23, 42, 0.08)',
-            backgroundColor: '#ffffff',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
+            px: 2,
+            pt: 1.5,
+            pb: 0,
           }}
         >
-          {/* Navigation Tabs above graph / context */}
-          <Box
+          <Tabs
+            value={activeLeftTab}
+            onChange={(_, val) => setActiveLeftTab(val)}
+            variant="scrollable"
+            scrollButtons="auto"
             sx={{
-              borderBottom: '1px solid',
-              borderColor: alpha('#111827', 0.06),
-              px: 2,
-              pt: 1.5,
-              pb: 0,
+              minHeight: 36,
+              '& .MuiTab-root': {
+                minHeight: 36,
+                paddingX: 1.5,
+                paddingY: 0.5,
+                textTransform: 'none',
+              },
             }}
           >
-            <Tabs
-              value={activeLeftTab}
-              onChange={(_, val) => setActiveLeftTab(val)}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{
-                minHeight: 36,
-                '& .MuiTab-root': {
-                  minHeight: 36,
-                  paddingX: 1.5,
-                  paddingY: 0.5,
-                  textTransform: 'none',
-                },
-              }}
-            >
+            <Tab
+              label="知识图谱"
+              value="graph"
+            />
+            {contextTabs.map(tab => (
               <Tab
-                label="知识图谱"
-                value="graph"
+                key={tab.id}
+                value={tab.id}
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Typography variant="caption">
+                      {tab.title}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleCloseContextTab(tab.id);
+                      }}
+                      sx={{
+                        ml: 0.5,
+                        color: '#9ca3af',
+                        '&:hover': { color: '#111827' },
+                      }}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                }
               />
-              {contextTabs.map(tab => (
-                <Tab
-                  key={tab.id}
-                  value={tab.id}
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Typography variant="caption">
-                        {tab.title}
-                      </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleCloseContextTab(tab.id);
-                        }}
-                        sx={{
-                          ml: 0.5,
-                          color: '#9ca3af',
-                          '&:hover': { color: '#111827' },
-                        }}
-                      >
-                        <CloseIcon fontSize="inherit" />
-                      </IconButton>
-                    </Box>
-                  }
-                />
-              ))}
-            </Tabs>
-          </Box>
+            ))}
+          </Tabs>
+        </Box>
 
-          {/* Content Area */}
-          <Box sx={{ flex: 1, minHeight: 0 }}>
-            {activeLeftTab === 'graph' ? (
-              <KnowledgeGraph height="100%" />
-            ) : (
-              (() => {
-                const tab = contextTabs.find(t => t.id === activeLeftTab);
-                if (!tab) return null;
-                return <ContextTableView contextData={tab.contextData} />;
-              })()
-            )}
-          </Box>
+        {/* Content Area */}
+        <Box sx={{ flex: 1, minHeight: 0 }}>
+          {activeLeftTab === 'graph' ? (
+            <KnowledgeGraph height="100%" />
+          ) : (
+            (() => {
+              const tab = contextTabs.find(t => t.id === activeLeftTab);
+              if (!tab) return null;
+              return <ContextTableView contextData={tab.contextData} />;
+            })()
+          )}
         </Box>
       </Box>
 
+      {/* Vertical separator / progress-style line between graph and chat */}
+      <Box
+        sx={{
+          width: 3,
+          mx: 2,
+          borderRadius: 1.5,
+          alignSelf: 'stretch',
+          background: 'linear-gradient(to bottom, #e5e7eb, #d1d5db, #e5e7eb)',
+        }}
+      />
+
       {/* Chat Panel - 30% */}
-      <Box sx={{ flex: 3, minWidth: 0 }}>
+      <Box
+        sx={{
+          flex: 3,
+          minWidth: 0,
+          backgroundColor: '#ffffff',
+        }}
+      >
         <ChatPanel height="100%" onExpandContext={handleExpandContext} />
       </Box>
 

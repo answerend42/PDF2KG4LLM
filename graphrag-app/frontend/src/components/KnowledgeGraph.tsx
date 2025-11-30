@@ -269,11 +269,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({ height }) => {
         height,
         position: 'relative',
         backgroundColor: '#ffffff',
-        borderRadius: 4,
         overflow: 'hidden',
-        border: '1px solid',
-        borderColor: alpha('#111827', 0.08),
-        boxShadow: '0 12px 30px rgba(15, 23, 42, 0.08)',
       }}
     >
       {/* Header */}

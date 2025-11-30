@@ -20,8 +20,8 @@ const theme = createTheme({
       dark: '#0f766e',
     },
     background: {
-      default: '#f3f4f6', // app background
-      paper: '#ffffff', // cards / panels
+      default: '#ffffff', // app background 改为纯白
+      paper: '#ffffff',   // cards / panels
     },
     text: {
       primary: '#111827',

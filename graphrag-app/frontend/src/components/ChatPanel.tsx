@@ -173,13 +173,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
         backgroundColor: '#ffffff',
         position: 'relative',
         overflow: 'hidden',
-        borderRadius: 4,
-        border: '1px solid',
-        borderColor: alpha('#111827', 0.08),
-        boxShadow: '0 12px 30px rgba(15, 23, 42, 0.08)',
       }}
     >
-      {/* Header with gradient: title + model selector + mode selector */}
+      {/* Header with gradient: model selector + mode selector */}
       <Box
         sx={{
           padding: 3,
@@ -188,22 +184,23 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
           borderColor: alpha('#111827', 0.06),
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: '#0f172a' }}>
-            智能问答
-          </Typography>
-          {/* Model selector: single tab with dropdown */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {/* Model selector: single tab with dropdown, left aligned */}
           <Box>
             <Chip
-              icon={<ModelDropdownIcon sx={{ fontSize: 18 }} />}
+              icon={<ModelDropdownIcon sx={{ fontSize: 20 }} />}
               label={activeModelId || '选择模型'}
               onClick={e => setModelMenuAnchor(e.currentTarget)}
-              size="small"
+              size="medium"
               sx={{
-                backgroundColor: '#f3f4f6',
+                borderRadius: 16,
+                px: 1.5,
+                height: 32,
+                fontSize: '0.9rem',
+                backgroundColor: modelMenuAnchor ? '#f3f4f6' : 'transparent',
                 color: '#111827',
                 border: '1px solid',
-                borderColor: '#e5e7eb',
+                borderColor: modelMenuAnchor ? '#e5e7eb' : 'transparent',
                 fontWeight: 500,
               }}
             />
@@ -211,8 +208,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
               anchorEl={modelMenuAnchor}
               open={Boolean(modelMenuAnchor)}
               onClose={() => setModelMenuAnchor(null)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
             >
               {availableModels.length === 0 && (
                 <MenuItem disabled>暂无可用模型</MenuItem>
@@ -231,10 +228,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
               ))}
             </Menu>
           </Box>
-        </Box>
 
-        {/* Mode Selector */}
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          {/* Mode Selector */}
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
           <Chip
             icon={<LocalIcon sx={{ fontSize: 18 }} />}
             label="本地搜索"
@@ -280,6 +276,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
               },
             }}
           />
+          </Box>
         </Box>
       </Box>
 
