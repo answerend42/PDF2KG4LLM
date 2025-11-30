@@ -31,7 +31,6 @@ const SettingsPage: React.FC = () => {
   );
   const [dirPickerOpen, setDirPickerOpen] = useState(false);
   const [dirPickerTarget, setDirPickerTarget] = useState<'input' | 'output' | null>(null);
-  const [availableModels, setAvailableModels] = useState<string[]>([]);
 
   const loadSettings = async () => {
     setLoading(true);
@@ -40,11 +39,40 @@ const SettingsPage: React.FC = () => {
         apiService.getSettings(),
         apiService.getRootPath(),
       ]);
-      setSettings(settingsData);
-      setRootPath(rootData.root_path || '');
+      // 确保至少有 5 个对话模型条目（默认）
+      const normalized: any = { ...(settingsData as any) };
+      normalized.models = { ...(settingsData.models as any) || {} };
 
-      const modelKeys = settingsData?.models ? Object.keys(settingsData.models) : [];
-      setAvailableModels(modelKeys);
+      const models: Record<string, any> = normalized.models;
+      const allIds = Object.keys(models || {});
+      const chatIds = allIds.filter(id => {
+        const m = models[id] || {};
+        const t = (m.type || '').toString().toLowerCase();
+        return t === 'chat' || id === 'default_chat_model';
+      });
+
+      const baseTemplate =
+        models.default_chat_model ||
+        (chatIds.length > 0 ? models[chatIds[0]] : null) ||
+        {
+          type: 'chat',
+          model_provider: 'openai',
+          model: 'gpt-4.1-mini',
+          api_base: 'https://api.openai.com/v1',
+          api_key: '',
+          auth_type: 'api_key',
+        };
+
+      let idx = 1;
+      while (chatIds.length < 5) {
+        const newId = `chat_model_${idx++}`;
+        if (models[newId]) continue;
+        models[newId] = { ...baseTemplate };
+        chatIds.push(newId);
+      }
+
+      setSettings(normalized as Settings);
+      setRootPath(rootData.root_path || '');
     } catch (error: any) {
       setMessage({ type: 'error', text: `加载设置失败: ${error.message}` });
     } finally {
@@ -246,9 +274,12 @@ const SettingsPage: React.FC = () => {
               </Typography>
               <Divider sx={{ my: 2 }} />
 
+              {/* 聊天模型列表 */}
               <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
                 聊天模型
               </Typography>
+
+              {/* 默认聊天模型 ID 选择 */}
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
@@ -267,56 +298,166 @@ const SettingsPage: React.FC = () => {
                       updateNestedValue(['global_search', 'chat_model_id'], value);
                     }}
                     margin="normal"
-                    helperText="该 ID 必须是下方 models 中定义的键名"
+                    helperText="该 ID 必须是下方对话模型列表中的模型 ID"
                   >
-                    {availableModels.map(id => (
+                    {Object.keys(settings.models as any || {}).map(id => (
                       <option key={id} value={id}>
                         {id}
                       </option>
                     ))}
                   </TextField>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="模型名称"
-                    value={settings.models.default_chat_model?.model || ''}
-                    onChange={e =>
-                      updateNestedValue(['models', 'default_chat_model', 'model'], e.target.value)
-                    }
-                    margin="normal"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    type="password"
-                    label="API Key（聊天模型）"
-                    value={settings.models.default_chat_model?.api_key || ''}
-                    onChange={e =>
-                      updateNestedValue(
-                        ['models', 'default_chat_model', 'api_key'],
-                        e.target.value
-                      )
-                    }
-                    margin="normal"
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="API Base"
-                    value={settings.models.default_chat_model?.api_base || ''}
-                    onChange={e =>
-                      updateNestedValue(
-                        ['models', 'default_chat_model', 'api_base'],
-                        e.target.value
-                      )
-                    }
-                    margin="normal"
-                  />
-                </Grid>
               </Grid>
+
+              {/* 可添加 / 删除的对话模型行 */}
+              <Box sx={{ mt: 2 }}>
+                {Object.entries(settings.models as any)
+                  .filter(([id, m]: any) => {
+                    const t = (m?.type || '').toString().toLowerCase();
+                    return t === 'chat' || id === 'default_chat_model';
+                  })
+                  .map(([id, model]: any, index) => (
+                    <Box
+                      key={id}
+                      sx={{
+                        border: '1px solid #e5e7eb',
+                        borderRadius: 2,
+                        p: 2,
+                        mb: 1.5,
+                      }}
+                    >
+                      <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} md={3}>
+                          <TextField
+                            fullWidth
+                            label="模型 ID"
+                            value={id}
+                            onChange={e => {
+                              const newId = e.target.value.trim();
+                              if (!newId || newId === id) return;
+                              setSettings(prev => {
+                                if (!prev) return prev;
+                                const next: any = {
+                                  ...prev,
+                                  models: { ...(prev.models as any) },
+                                };
+                                if (next.models?.[newId]) return next as Settings;
+                                next.models[newId] = next.models[id];
+                                delete next.models[id];
+                                if (next.local_search?.chat_model_id === id) {
+                                  next.local_search.chat_model_id = newId;
+                                }
+                                if (next.global_search?.chat_model_id === id) {
+                                  next.global_search.chat_model_id = newId;
+                                }
+                                return next as Settings;
+                              });
+                            }}
+                            margin="normal"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={3}>
+                          <TextField
+                            fullWidth
+                            label="模型名称"
+                            value={model?.model || ''}
+                            onChange={e =>
+                              updateNestedValue(['models', id, 'model'], e.target.value)
+                            }
+                            margin="normal"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={3}>
+                          <TextField
+                            fullWidth
+                            label="API Base"
+                            value={model?.api_base || ''}
+                            onChange={e =>
+                              updateNestedValue(['models', id, 'api_base'], e.target.value)
+                            }
+                            margin="normal"
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={3}>
+                          <TextField
+                            fullWidth
+                            type="password"
+                            label="API Key"
+                            value={model?.api_key || ''}
+                            onChange={e =>
+                              updateNestedValue(['models', id, 'api_key'], e.target.value)
+                            }
+                            margin="normal"
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button
+                              size="small"
+                              color="error"
+                              disabled={Object.keys((settings.models as any) || {}).length <= 1}
+                              onClick={() => {
+                                setSettings(prev => {
+                                  if (!prev) return prev;
+                                  const next: any = {
+                                    ...prev,
+                                    models: { ...(prev.models as any) },
+                                  };
+                                  delete next.models[id];
+                                  if ((next as any).local_search?.chat_model_id === id) {
+                                    (next as any).local_search.chat_model_id =
+                                      Object.keys(next.models || {})[0] || '';
+                                  }
+                                  if ((next as any).global_search?.chat_model_id === id) {
+                                    (next as any).global_search.chat_model_id =
+                                      Object.keys(next.models || {})[0] || '';
+                                  }
+                                  return next as Settings;
+                                });
+                              }}
+                            >
+                              删除该对话模型
+                            </Button>
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  ))}
+
+                <Box sx={{ mt: 1 }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                      setSettings(prev => {
+                        if (!prev) return prev;
+                        const next: any = { ...prev, models: { ...prev.models } };
+                        const base =
+                          next.models.default_chat_model ||
+                          Object.values(next.models)[0] ||
+                          {
+                            type: 'chat',
+                            model_provider: 'openai',
+                            model: 'gpt-4.1-mini',
+                            api_base: 'https://api.openai.com/v1',
+                            api_key: '',
+                            auth_type: 'api_key',
+                          };
+                        let idx = 1;
+                        let newId = `chat_model_${idx}`;
+                        while (next.models[newId]) {
+                          idx += 1;
+                          newId = `chat_model_${idx}`;
+                        }
+                        next.models[newId] = { ...base };
+                        return next;
+                      });
+                    }}
+                  >
+                    添加对话模型
+                  </Button>
+                </Box>
+              </Box>
 
               <Typography variant="subtitle1" gutterBottom sx={{ mt: 3 }}>
                 嵌入模型

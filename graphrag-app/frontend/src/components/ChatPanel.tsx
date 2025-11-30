@@ -43,6 +43,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [activeModelId, setActiveModelId] = useState<string>('default_chat_model');
   const [modelMenuAnchor, setModelMenuAnchor] = useState<null | HTMLElement>(null);
+  const [modeMenuAnchor, setModeMenuAnchor] = useState<null | HTMLElement>(null);
   const [chatFontSize, setChatFontSize] = useState<number>(15);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -229,54 +230,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
             </Menu>
           </Box>
 
-          {/* Mode Selector */}
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Chip
-            icon={<LocalIcon sx={{ fontSize: 18 }} />}
-            label="本地搜索"
-            onClick={() => setSearchMode('local')}
-            sx={{
-              backgroundColor: searchMode === 'local' ? alpha('#2563eb', 0.12) : '#f3f4f6',
-              color: searchMode === 'local' ? '#1d4ed8' : '#6b7280',
-              border: '1px solid',
-              borderColor: searchMode === 'local' ? alpha('#2563eb', 0.6) : 'transparent',
-              fontWeight: searchMode === 'local' ? 600 : 400,
-              '&:hover': {
-                backgroundColor: searchMode === 'local' ? alpha('#2563eb', 0.18) : '#e5e7eb',
-              },
-            }}
-          />
-          <Chip
-            icon={<GlobalIcon sx={{ fontSize: 18 }} />}
-            label="全局搜索"
-            onClick={() => setSearchMode('global')}
-            sx={{
-              backgroundColor: searchMode === 'global' ? alpha('#14b8a6', 0.12) : '#f3f4f6',
-              color: searchMode === 'global' ? '#0f766e' : '#6b7280',
-              border: '1px solid',
-              borderColor: searchMode === 'global' ? alpha('#14b8a6', 0.6) : 'transparent',
-              fontWeight: searchMode === 'global' ? 600 : 400,
-              '&:hover': {
-                backgroundColor: searchMode === 'global' ? alpha('#14b8a6', 0.18) : '#e5e7eb',
-              },
-            }}
-          />
-          <Chip
-            icon={<SparkleIcon sx={{ fontSize: 18 }} />}
-            label="纯对话（无搜索）"
-            onClick={() => setSearchMode('chat')}
-            sx={{
-              backgroundColor: searchMode === 'chat' ? alpha('#a855f7', 0.12) : '#f3f4f6',
-              color: searchMode === 'chat' ? '#7e22ce' : '#6b7280',
-              border: '1px solid',
-              borderColor: searchMode === 'chat' ? alpha('#a855f7', 0.6) : 'transparent',
-              fontWeight: searchMode === 'chat' ? 600 : 400,
-              '&:hover': {
-                backgroundColor: searchMode === 'chat' ? alpha('#a855f7', 0.18) : '#e5e7eb',
-              },
-            }}
-          />
-          </Box>
+          {/* Mode Selector 已移动到输入框左侧 + 号菜单中 */}
         </Box>
       </Box>
 
@@ -695,6 +649,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
           sx={{
             display: 'flex',
             gap: 1,
+            alignItems: 'center',
             backgroundColor: '#ffffff',
             borderRadius: 3,
             border: '1px solid',
@@ -707,6 +662,86 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ height, onExpandContext }) => {
             },
           }}
         >
+          {/* 对话模式切换：左侧 + 号按钮 + 当前模式标签 */}
+          <IconButton
+            size="small"
+            onClick={e => setModeMenuAnchor(e.currentTarget)}
+            sx={{
+              width: 32,
+              height: 32,
+              alignSelf: 'center',
+              borderRadius: '999px',
+              border: '1px solid #e5e7eb',
+              backgroundColor: '#f9fafb',
+              mr: 0.5,
+            }}
+          >
+            <Typography variant="h6" sx={{ lineHeight: 1, color: '#4b5563' }}>
+              +
+            </Typography>
+          </IconButton>
+          <Menu
+            anchorEl={modeMenuAnchor}
+            open={Boolean(modeMenuAnchor)}
+            onClose={() => setModeMenuAnchor(null)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          >
+            <MenuItem
+              selected={searchMode === 'local'}
+              onClick={() => {
+                setSearchMode('local');
+                setModeMenuAnchor(null);
+              }}
+            >
+              本地搜索（GraphRAG local）
+            </MenuItem>
+            <MenuItem
+              selected={searchMode === 'global'}
+              onClick={() => {
+                setSearchMode('global');
+                setModeMenuAnchor(null);
+              }}
+            >
+              全局搜索（GraphRAG global）
+            </MenuItem>
+            <MenuItem
+              selected={searchMode === 'chat'}
+              onClick={() => {
+                setSearchMode('chat');
+                setModeMenuAnchor(null);
+              }}
+            >
+              纯对话（无搜索）
+            </MenuItem>
+          </Menu>
+          <Box
+            sx={{
+              mr: 1,
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                whiteSpace: 'nowrap',
+                fontSize: `${chatFontSize}px`,
+                color:
+                  searchMode === 'local'
+                    ? '#1d4ed8'
+                    : searchMode === 'global'
+                    ? '#0f766e'
+                    : '#7e22ce',
+                fontWeight: 600,
+              }}
+            >
+              {searchMode === 'local'
+                ? '本地搜索'
+                : searchMode === 'global'
+                ? '全局搜索'
+                : '纯对话'}
+            </Typography>
+          </Box>
+
           <TextField
             inputRef={inputRef}
             fullWidth
