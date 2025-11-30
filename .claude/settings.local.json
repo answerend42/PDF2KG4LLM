@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(chmod:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(cd:*)",
+      "Bash(source:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(timeout 5 python:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

@@ -508,6 +508,7 @@ def _query_cli(
                 streaming=streaming,
                 query=query,
                 verbose=verbose,
+                cli_overrides=None,
             )
         case SearchMethod.GLOBAL:
             run_global_search(
@@ -520,6 +521,7 @@ def _query_cli(
                 streaming=streaming,
                 query=query,
                 verbose=verbose,
+                cli_overrides=None,
             )
         case SearchMethod.DRIFT:
             run_drift_search(

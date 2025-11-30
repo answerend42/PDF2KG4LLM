@@ -99,7 +99,7 @@ async def _execute(
         return result
 
     futures = [embed(chunk) for chunk in chunks]
-    results = await asyncio.gather(*futures)
+    results = await asyncio.gather(*futures, return_exceptions=False)
     # merge results in a single list of lists (reduce the collect dimension)
     return [item for sublist in results for item in sublist]
 
@@ -161,6 +161,13 @@ def _reconstitute_embeddings(
     """Reconstitute the embeddings into the original input texts."""
     embeddings: list[list[float] | None] = []
     cursor = 0
+    expected_total = sum(sizes)
+
+    # Check if we have enough embeddings
+    if len(raw_embeddings) < expected_total:
+        msg = f"Expected {expected_total} embeddings but got {len(raw_embeddings)}. Some embedding requests may have failed."
+        raise ValueError(msg)
+
     for size in sizes:
         if size == 0:
             embeddings.append(None)

@@ -1,0 +1,112 @@
+basic_search:
+  chat_model_id: default_chat_model
+  embedding_model_id: default_embedding_model
+  prompt: prompts/basic_search_system_prompt.txt
+cache:
+  base_dir: cache
+  type: file
+chunks:
+  group_by_columns:
+  - id
+  overlap: 200
+  size: 2500
+cluster_graph:
+  max_cluster_size: 10
+community_reports:
+  graph_prompt: prompts/community_report_graph.txt
+  max_input_length: 8000
+  max_length: 2000
+  model_id: default_chat_model
+  text_prompt: prompts/community_report_text.txt
+drift_search:
+  chat_model_id: default_chat_model
+  embedding_model_id: default_embedding_model
+  prompt: prompts/drift_search_system_prompt.txt
+  reduce_prompt: prompts/drift_search_reduce_prompt.txt
+embed_graph:
+  enabled: false
+embed_text:
+  model_id: default_embedding_model
+  vector_store_id: default_vector_store
+extract_claims:
+  description: Any claims or facts that could be relevant to information discovery.
+  enabled: false
+  max_gleanings: 1
+  model_id: default_chat_model
+  prompt: prompts/extract_claims.txt
+extract_graph:
+  entity_types:
+  - organization
+  - person
+  - geo
+  - event
+  max_gleanings: 1
+  model_id: default_chat_model
+  prompt: prompts/extract_graph.txt
+extract_graph_nlp:
+  async_mode: threaded
+  text_analyzer:
+    extractor_type: regex_english
+global_search:
+  chat_model_id: default_chat_model
+  knowledge_prompt: prompts/global_search_knowledge_system_prompt.txt
+  map_prompt: prompts/global_search_map_system_prompt.txt
+  reduce_prompt: prompts/global_search_reduce_system_prompt.txt
+input:
+  file_type: text
+  storage:
+    base_dir: input
+    type: file
+local_search:
+  chat_model_id: default_chat_model
+  embedding_model_id: default_embedding_model
+  prompt: prompts/local_search_system_prompt.txt
+models:
+  default_chat_model:
+    api_base: https://api.deepseek.com/v1
+    api_key: sk-01833fe379af4d78a1b479810f47206d
+    async_mode: threaded
+    auth_type: api_key
+    concurrent_requests: 25
+    enable_thinking: false
+    max_retries: 3
+    model: deepseek-chat
+    model_provider: openai
+    model_supports_json: false
+    requests_per_minute: null
+    retry_strategy: exponential_backoff
+    tokens_per_minute: null
+    type: chat
+  default_embedding_model:
+    api_base: http://localhost:11434
+    api_key: ollama
+    async_mode: threaded
+    auth_type: api_key
+    concurrent_requests: 5
+    max_retries: 10
+    model: bge-m3:latest
+    model_provider: ollama
+    requests_per_minute: null
+    retry_strategy: exponential_backoff
+    tokens_per_minute: null
+    type: embedding
+output:
+  base_dir: output
+  type: file
+reporting:
+  base_dir: logs
+  type: file
+snapshots:
+  embeddings: false
+  graphml: false
+summarize_descriptions:
+  max_length: 500
+  model_id: default_chat_model
+  prompt: prompts/summarize_descriptions.txt
+umap:
+  enabled: false
+vector_store:
+  default_vector_store:
+    container_name: default
+    db_uri: output/lancedb
+    type: lancedb

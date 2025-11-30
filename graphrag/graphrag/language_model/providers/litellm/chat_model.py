@@ -251,7 +251,8 @@ class LitellmChatModel:
         new_args = {k: v for k, v in kwargs.items() if k in args_to_include}
 
         # If using JSON, check if response_format should be a Pydantic model or just a general JSON object
-        if kwargs.get("json"):
+        # Only set response_format if model_supports_json is True
+        if kwargs.get("json") and self.config.model_supports_json:
             new_args["response_format"] = {"type": "json_object"}
 
             if (
